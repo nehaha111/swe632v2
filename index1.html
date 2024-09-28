@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Engine Prototype</title>
+    <link rel="stylesheet" href="css1.css">
+</head>
+<body>
+    <h1>Task Engine</h1>
+
+    <div class="task-form">
+        <form id="taskForm">
+            <label for="title">Title:</label>
+            <input type="text" id="title" required>
+
+            <label for="team">Team:</label>
+            <select id="team" required>
+                <option value="Development Team">Development Team</option>
+                <option value="Design Team">Design Team</option>
+                <option value="Quality Assurance Team">Quality Assurance Team</option>
+                <option value="Business Analyst Team">Business Analyst Team</option>
+                <option value="Marketing Team">Marketing Team</option>
+                <option value="Support Team">Support Team</option>
+                <option value="Documentation Team">Documentation Team</option>
+            </select>
+
+            <label for="description">Description:</label>
+            <textarea id="description" required></textarea>
+            <p id="wordCount">0/30 words</p>
+
+            <label for="priority">Priority:</label>
+            <select id="priority" required>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+            </select>
+
+            <label for="deadline">Deadline:</label>
+            <input type="date" id="deadline" required>
+
+            <label for="assignee">Assignee:</label>
+            <select id="assignee" required>
+                <option value="Member1">Member1</option>
+                <option value="Member2">Member2</option>
+                <option value="Member3">Member3</option>
+                <option value="Member4">Member4</option>
+            </select>
+
+            <button type="submit">Add Task</button>
+        </form>
+    </div>
+
+    <!-- Help Button -->
+    <div id="help-section">
+        <button id="helpButton">Help</button>
+        <div id="helpTooltip" class="tooltip">Fill out all fields to create a task. Click "Add Task" when done.</div>
+    </div>
+
+    <div class="search-filter">
+        <input type="text" id="search" placeholder="Search tasks">
+        <select id="filter">
+            <option value="">All</option>
+            <option value="Low">Low Priority</option>
+            <option value="Medium">Medium Priority</option>
+            <option value="High">High Priority</option>
+        </select>
+    </div>
+
+    <div id="feedbackMessage" class="feedback"></div>
+
+    <table id="taskTable">
+        <thead>
+            <tr>
+                <th>Title</th>
+                <th>Team</th>
+                <th>Description</th>
+                <th>Priority</th>
+                <th>Deadline</th>
+                <th>Assignee</th>
+                <th>Status</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <script src="javascript1.js"></script>
+</body>
+</html>
+
