@@ -1,11 +1,11 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const taskForm = document.getElementById('taskForm');
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
     const descriptionInput = document.getElementById('description');
     const wordCountDisplay = document.getElementById('wordCount');
-    const confirmationMessage = document.getElementById('confirmationMessage');
+    const deadlineInput = document.getElementById('deadline');
 
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
-        row.innerHTML = 
-            `<td>${task.title}</td>
+        row.innerHTML = `
+            <td>${task.title}</td>
             <td>${task.team}</td>
             <td>${task.description}</td>
             <td>${task.priority}</td>
@@ -31,12 +31,16 @@ document.addEventListener('DOMContentLoaded', function() {
             <td>
                 <button class="edit-btn">Edit</button>
                 <button class="delete-btn">Delete</button>
-            </td>`;
+            </td>
+        `;
 
         // Add delete functionality
         row.querySelector('.delete-btn').addEventListener('click', () => {
-            tasks.splice(index, 1); // Remove the task from the list
-            displayTasks(); // Re-display the tasks
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks.splice(index, 1); // Remove the task from the list
+                displayTasks(); // Re-display the tasks
+                showPopup('Task deleted successfully!'); // Show confirmation message
+            }
         });
 
         // Add edit functionality
@@ -64,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Add or update a task
-    taskForm.addEventListener('submit', function(event) {
+    taskForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
         const newTask = {
@@ -79,51 +83,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (editIndex === null) {
             // Add new task
             tasks.push(newTask);
+            showPopup('Task added successfully!'); // Show confirmation message
         } else {
             // Update the existing task
             tasks[editIndex] = newTask;
+            showPopup('Task updated successfully!'); // Show confirmation message
             editIndex = null;
         }
 
         taskForm.reset(); // Clear the form
         document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
         displayTasks(); // Refresh the task table
-
-        // Show confirmation message
-        confirmationMessage.style.display = 'block';
-        setTimeout(() => {
-            confirmationMessage.style.display = 'none';
-        }, 2000); // Hide message after 2 seconds
     });
 
-    // Word count functionality for description
-    descriptionInput.addEventListener('input', function() {
-        const wordCount = this.value.split(/\s+/).filter(word => word.length > 0).length;
-        wordCountDisplay.textContent = `${wordCount}/30 words`;
-    });
-
-    // Search and filter functionality
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        displayTasks(); // Refresh the task list before filtering
-        Array.from(taskTable.rows).forEach(row => {
-            const taskTitle = row.cells[0].textContent.toLowerCase();
-            const isVisible = taskTitle.includes(searchTerm);
-            row.style.display = isVisible ? '' : 'none';
-        });
-    });
-
-    filterSelect.addEventListener('change', function() {
-        const filterValue = this.value;
-        displayTasks(); // Refresh the task list before filtering
-        Array.from(taskTable.rows).forEach(row => {
-            const taskPriority = row.cells[3].textContent;
-            const isVisible = filterValue === '' || taskPriority === filterValue;
-            row.style.display = isVisible ? '' : 'none';
-        });
-    });
-
-    // Edit task function
+    // Function to fill the form with task data for editing
     function editTask(index) {
         const task = tasks[index];
         document.getElementById('title').value = task.title;
@@ -133,7 +106,65 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('deadline').value = task.deadline;
         document.getElementById('assignee').value = task.assignee;
 
-        editIndex = index; // Set edit index
-        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change button text
+        editIndex = index; // Set the current edit index
+        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
     }
+
+    // Word count logic
+    descriptionInput.addEventListener('input', function () {
+        const wordCount = descriptionInput.value.split(/\s+/).filter(word => word.length > 0).length;
+        wordCountDisplay.textContent = `${wordCount}/30 words`;
+        if (wordCount > 30) {
+            wordCountDisplay.style.color = 'red';
+        } else {
+            wordCountDisplay.style.color = '#888';
+        }
+    });
+
+    // Set date input to only show future dates
+    const today = new Date().toISOString().split('T')[0];
+    deadlineInput.setAttribute('min', today);
+
+    // Function to show a popup message
+    function showPopup(message) {
+        const popup = document.createElement('div');
+        popup.className = 'popup active';
+        popup.innerHTML = `
+            <p>${message}</p>
+            <button id="closePopup">OK</button>
+        `;
+        document.body.appendChild(popup);
+
+        document.getElementById('closePopup').onclick = function () {
+            popup.classList.remove('active');
+            setTimeout(() => {
+                document.body.removeChild(popup);
+            }, 300); // Allow time for the fade out effect
+        };
+    }
+
+    // Function to filter tasks by search or priority
+    function filterTasks() {
+        const searchQuery = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+
+        const filteredTasks = tasks.filter(task =>
+            (task.title.toLowerCase().includes(searchQuery) ||
+                task.description.toLowerCase().includes(searchQuery)) &&
+            (filterValue === '' || task.priority === filterValue)
+        );
+
+        taskTable.innerHTML = ''; // Clear the table for filtered results
+        if (filteredTasks.length === 0) {
+            showPopup('No matches found.'); // Show no matches found message
+        } else {
+            filteredTasks.forEach((task, index) => {
+                addTaskRow(task, index); // Add filtered tasks to the table
+            });
+        }
+    }
+
+    // Add event listeners for filtering tasks
+    searchInput.addEventListener('input', filterTasks);
+    filterSelect.addEventListener('change', filterTasks);
 });
