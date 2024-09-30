@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const filterSelect = document.getElementById('filter');
     const descriptionInput = document.getElementById('description');
     const wordCountDisplay = document.getElementById('wordCount');
-    const deadlineInput = document.getElementById('deadline');
     const confirmationMessage = document.getElementById('confirmationMessage');
 
     let tasks = [];
@@ -92,5 +91,49 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Show confirmation message
         confirmationMessage.style.display = 'block';
-       
+        setTimeout(() => {
+            confirmationMessage.style.display = 'none';
+        }, 2000); // Hide message after 2 seconds
+    });
 
+    // Word count functionality for description
+    descriptionInput.addEventListener('input', function() {
+        const wordCount = this.value.split(/\s+/).filter(word => word.length > 0).length;
+        wordCountDisplay.textContent = `${wordCount}/30 words`;
+    });
+
+    // Search and filter functionality
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        displayTasks(); // Refresh the task list before filtering
+        Array.from(taskTable.rows).forEach(row => {
+            const taskTitle = row.cells[0].textContent.toLowerCase();
+            const isVisible = taskTitle.includes(searchTerm);
+            row.style.display = isVisible ? '' : 'none';
+        });
+    });
+
+    filterSelect.addEventListener('change', function() {
+        const filterValue = this.value;
+        displayTasks(); // Refresh the task list before filtering
+        Array.from(taskTable.rows).forEach(row => {
+            const taskPriority = row.cells[3].textContent;
+            const isVisible = filterValue === '' || taskPriority === filterValue;
+            row.style.display = isVisible ? '' : 'none';
+        });
+    });
+
+    // Edit task function
+    function editTask(index) {
+        const task = tasks[index];
+        document.getElementById('title').value = task.title;
+        document.getElementById('team').value = task.team;
+        document.getElementById('description').value = task.description;
+        document.getElementById('priority').value = task.priority;
+        document.getElementById('deadline').value = task.deadline;
+        document.getElementById('assignee').value = task.assignee;
+
+        editIndex = index; // Set edit index
+        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change button text
+    }
+});
