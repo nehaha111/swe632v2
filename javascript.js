@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function() {
     const taskForm = document.getElementById('taskForm');
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (confirm('Are you sure you want to delete this task?')) {
                 tasks.splice(index, 1); // Remove the task from the list
                 displayTasks(); // Re-display the tasks
-                showPopup('Task deleted successfully!'); // Show confirmation message
+                showPopup('Task deleted successfully!'); // Show popup
             }
         });
 
@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (task.priority === 'Medium') {
             priorityCell.style.color = 'orange';
         } else if (task.priority === 'Low') {
+            priorityCell.style
             priorityCell.style.color = 'green';
         }
     }
@@ -68,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Add or update a task
-    taskForm.addEventListener('submit', function (event) {
+    taskForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
         const newTask = {
@@ -83,11 +84,11 @@ document.addEventListener('DOMContentLoaded', function () {
         if (editIndex === null) {
             // Add new task
             tasks.push(newTask);
-            showPopup('Task added successfully!'); // Show confirmation message
+            showPopup('Task added successfully!'); // Show popup
         } else {
             // Update the existing task
             tasks[editIndex] = newTask;
-            showPopup('Task updated successfully!'); // Show confirmation message
+            showPopup('Task updated successfully!'); // Show popup
             editIndex = null;
         }
 
@@ -111,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Word count logic
-    descriptionInput.addEventListener('input', function () {
+    descriptionInput.addEventListener('input', function() {
         const wordCount = descriptionInput.value.split(/\s+/).filter(word => word.length > 0).length;
         wordCountDisplay.textContent = `${wordCount}/30 words`;
         if (wordCount > 30) {
@@ -125,46 +126,41 @@ document.addEventListener('DOMContentLoaded', function () {
     const today = new Date().toISOString().split('T')[0];
     deadlineInput.setAttribute('min', today);
 
-    // Function to show a popup message
-    function showPopup(message) {
-        const popup = document.createElement('div');
-        popup.className = 'popup active';
-        popup.innerHTML = `
-            <p>${message}</p>
-            <button id="closePopup">OK</button>
-        `;
-        document.body.appendChild(popup);
-
-        document.getElementById('closePopup').onclick = function () {
-            popup.classList.remove('active');
-            setTimeout(() => {
-                document.body.removeChild(popup);
-            }, 300); // Allow time for the fade out effect
-        };
-    }
-
     // Function to filter tasks by search or priority
     function filterTasks() {
         const searchQuery = searchInput.value.toLowerCase();
         const filterValue = filterSelect.value;
 
-        const filteredTasks = tasks.filter(task =>
-            (task.title.toLowerCase().includes(searchQuery) ||
-                task.description.toLowerCase().includes(searchQuery)) &&
+        const filteredTasks = tasks.filter(task => 
+            (task.title.toLowerCase().includes(searchQuery) || 
+            task.description.toLowerCase().includes(searchQuery)) &&
             (filterValue === '' || task.priority === filterValue)
         );
 
-        taskTable.innerHTML = ''; // Clear the table for filtered results
-        if (filteredTasks.length === 0) {
-            showPopup('No matches found.'); // Show no matches found message
-        } else {
-            filteredTasks.forEach((task, index) => {
-                addTaskRow(task, index); // Add filtered tasks to the table
-            });
-        }
+        // Update the table based on filtered results
+        taskTable.innerHTML = ''; // Clear existing tasks
+        filteredTasks.forEach((task, index) => {
+            addTaskRow(task, index); // Add each filtered task
+        });
     }
 
-    // Add event listeners for filtering tasks
+    // Event listeners for search and filter inputs
     searchInput.addEventListener('input', filterTasks);
     filterSelect.addEventListener('change', filterTasks);
+
+    // Popup function
+    function showPopup(message) {
+        const popup = document.createElement('div');
+        popup.className = 'popup show';
+        popup.innerHTML = `
+            <p>${message}</p>
+            <button id="closePopup">Close</button>
+        `;
+        document.body.appendChild(popup);
+
+        document.getElementById('closePopup').addEventListener('click', () => {
+            document.body.removeChild(popup);
+        });
+    }
 });
+
