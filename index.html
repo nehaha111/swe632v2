@@ -3,72 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Engine Prototype</title>
+    <title>Task Management Application</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Task Engine</h1>
-
     <div class="container">
-        <div class="task-form">
-            <form id="taskForm">
-                <h2>Add/Edit Task</h2>
-                <div class="form-field">
-                    <label for="title">Title:</label>
-                    <input type="text" id="title" required>
-                </div>
-                <div class="form-field">
-                    <label for="team">Team:</label>
-                    <select id="team" required>
-                        <option value="Development Team">Development Team</option>
-                        <option value="Design Team">Design Team</option>
-                        <option value="Quality Assurance Team">Quality Assurance Team</option>
-                        <option value="Business Analyst Team">Business Analyst Team</option>
-                        <option value="Marketing Team">Marketing Team</option>
-                        <option value="Support Team">Support Team</option>
-                        <option value="Documentation Team">Documentation Team</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label for="description">Description:</label>
-                    <textarea id="description" required></textarea>
-                    <p id="wordCount">0/30 words</p>
-                </div>
-                <div class="form-field">
-                    <label for="priority">Priority:</label>
-                    <select id="priority" required>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
-                        <option value="High">High</option>
-                    </select>
-                </div>
-                <div class="form-field">
-                    <label for="deadline">Deadline:</label>
-                    <input type="date" id="deadline" required>
-                </div>
-                <div class="form-field">
-                    <label for="assignee">Assignee:</label>
-                    <select id="assignee" required>
-                        <option value="Member1">Member1</option>
-                        <option value="Member2">Member2</option>
-                        <option value="Member3">Member3</option>
-                        <option value="Member4">Member4</option>
-                    </select>
-                </div>
-                <button type="submit" class="btn">Add Task</button>
-            </form>
-        </div>
+        <h1>Task Management System</h1>
 
+        <!-- Task Form -->
+        <form id="taskForm" class="task-form">
+            <div>
+                <label for="title">Task Title</label>
+                <input type="text" id="title" required>
+            </div>
+
+            <div>
+                <label for="team">Team</label>
+                <input type="text" id="team" required>
+            </div>
+
+            <div>
+                <label for="description">Task Description</label>
+                <textarea id="description" maxlength="200" required></textarea>
+                <small id="wordCount">0/30 words</small>
+            </div>
+
+            <div>
+                <label for="priority">Priority</label>
+                <select id="priority" required>
+                    <option value="High">High</option>
+                    <option value="Medium">Medium</option>
+                    <option value="Low">Low</option>
+                </select>
+            </div>
+
+            <div>
+                <label for="deadline">Deadline</label>
+                <input type="date" id="deadline" required>
+            </div>
+
+            <div>
+                <label for="assignee">Assignee</label>
+                <input type="text" id="assignee" required>
+            </div>
+
+            <div style="grid-column: span 2;">
+                <button type="submit">Add Task</button>
+            </div>
+        </form>
+
+        <!-- Search and Filter Section -->
         <div class="search-filter">
-            <input type="text" id="search" placeholder="Search tasks" class="search-input">
-            <select id="filter" class="filter-select">
-                <option value="">All</option>
-                <option value="Low">Low Priority</option>
-                <option value="Medium">Medium Priority</option>
-                <option value="High">High Priority</option>
+            <input type="text" id="search" placeholder="Search tasks..." style="width: 60%; padding: 10px;">
+            <select id="filter">
+                <option value="">Filter by Priority</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
             </select>
         </div>
 
+        <!-- Task Table -->
         <table id="taskTable">
             <thead>
                 <tr>
@@ -83,8 +78,15 @@
                 </tr>
             </thead>
             <tbody>
+                <!-- Task rows will be dynamically added here -->
             </tbody>
         </table>
+
+        <!-- Popup for feedback (like task deletion or addition) -->
+        <div class="popup"></div>
+
+        <!-- Popup for no match found during search -->
+        <div class="no-match-popup">No tasks found matching your search</div>
     </div>
 
     <script src="javascript.js"></script>
