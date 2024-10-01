@@ -7,17 +7,20 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>Task Engine</h1>
-<!-- Help and Documentation Button -->
-<button id="helpButton">Help & Documentation</button>
-
-<!-- Help Popup -->
-<div id="helpPopup" class="help-popup">
-    <p>This is where you can add helpful documentation or instructions for using the task manager.</p>
-    <button id="closePopup">Close</button>
-</div>
-
+    <!-- Main Container -->
     <div class="container">
+        <h1>Task Engine</h1>
+
+        <!-- Help and Documentation Button -->
+        <button id="helpButton">Help & Documentation</button>
+
+        <!-- Help Popup -->
+        <div id="helpPopup" class="help-popup">
+            <p id="helpMessage">Hello</p>
+            <button id="closePopup">Close</button>
+        </div>
+
+        <!-- Task Form -->
         <div class="task-form">
             <form id="taskForm">
                 <div class="form-left">
@@ -64,21 +67,22 @@
             </form>
         </div>
 
-     <div class="search-filter">
-    <div class="search-container">
-        <input type="text" id="search" placeholder="Search tasks">
-        <i class="fas fa-search"></i>
-    </div>
-    <select id="filter">
-        <option value="">All</option>
-        <option value="Low">Low Priority</option>
-        <option value="Medium">Medium Priority</option>
-        <option value="High">High Priority</option>
-    </select>
-    <p id="noResults" style="display: none;">No task matches your search.</p>
-</div>
+        <!-- Search and Filter -->
+        <div class="search-filter">
+            <div class="search-container">
+                <input type="text" id="search" placeholder="Search tasks">
+                <i class="fas fa-search"></i>
+            </div>
+            <select id="filter">
+                <option value="">All</option>
+                <option value="Low">Low Priority</option>
+                <option value="Medium">Medium Priority</option>
+                <option value="High">High Priority</option>
+            </select>
+            <p id="noResults" style="display: none;">No task matches your search.</p>
+        </div>
 
-
+        <!-- Task Table -->
         <table id="taskTable">
             <thead>
                 <tr>
@@ -96,6 +100,7 @@
         </table>
     </div>
 
+    <!-- JavaScript -->
     <script src="javascript.js"></script>
 </body>
 </html>
