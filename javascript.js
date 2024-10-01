@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </select>
             </td>
             <td>
-                <button class="edit-btn">Edit</button>
+                <button class="edit-btn">Update</button>
                 <button class="delete-btn">Delete</button>
             </td>
         `;
