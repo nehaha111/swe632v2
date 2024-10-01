@@ -10,7 +10,6 @@
     <div class="container">
         <header>
             <h1>Task Management</h1>
-            <button id="helpBtn">Help & Documentation</button>
         </header>
 
         <!-- Task Form -->
@@ -22,9 +21,9 @@
 
                     <label for="team">Team:</label>
                     <select id="team">
-                        <option value="Team A">Team A</option>
-                        <option value="Team B">Team B</option>
-                        <option value="Team C">Team C</option>
+                        <option value="Team A">Development Team</option>
+                        <option value="Team B">Testing Team</option>
+                        <option value="Team C">Marketing Team</option>
                     </select>
 
                     <label for="priority">Priority:</label>
@@ -44,7 +43,11 @@
                     <input type="date" id="deadline" required>
 
                     <label for="assignee">Assignee:</label>
-                    <input type="text" id="assignee" required>
+                    <select id="assignee">
+                        <option value="John Doe">John Doe</option>
+                        <option value="Jane Smith">Jane Smith</option>
+                        <option value="Alex Johnson">Alex Johnson</option>
+                    </select>
                 </div>
             </div>
             
@@ -52,7 +55,6 @@
                 <button type="submit">Add Task</button>
                 <button type="button" id="resetBtn">Reset</button>
                 <button type="button" id="undoBtn">Undo</button>
-                <button type="button" id="redoBtn">Redo</button>
             </div>
         </form>
 
@@ -69,7 +71,7 @@
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
             </select>
-            <div id="noMatchMessage"></div> <!-- No matches message -->
+            <div id="noMatchMessage" style="display: none;">No task matching your search</div>
         </div>
 
         <!-- Task Table -->
@@ -90,16 +92,6 @@
         </table>
     </div>
 
-    <!-- Help and Documentation Modal -->
-    <div id="helpModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Help & Documentation</h2>
-            <p>This is the task manager. Here you can add, update, and delete tasks...</p>
-        </div>
-    </div>
-
     <script src="javascript.js"></script>
 </body>
 </html>
-
