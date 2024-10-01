@@ -49,6 +49,16 @@ document.addEventListener('DOMContentLoaded', function() {
             editTask(index);
         });
 
+        // Help and Documentation Button Popup Logic
+document.getElementById('helpButton').addEventListener('click', function() {
+    document.getElementById('helpPopup').style.display = 'block';
+});
+
+document.getElementById('closePopup').addEventListener('click', function() {
+    document.getElementById('helpPopup').style.display = 'none';
+});
+
+
         // Apply priority color to the priority cell
         const priorityCell = row.cells[3];
         if (task.priority === 'High') {
