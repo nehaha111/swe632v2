@@ -6,94 +6,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const descriptionInput = document.getElementById('description');
     const wordCountDisplay = document.getElementById('wordCount');
     const deadlineInput = document.getElementById('deadline');
-    const noMatchMessage = document.getElementById('noMatchMessage');
-    
+    const undoButton = document.getElementById('undoBtn');
+    const resetButton = document.getElementById('resetBtn');
+
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
-    let undoStack = [];
-    let redoStack = [];
+    const undoStack = [[]]; // Stack to store states for undo
 
-    // Help Modal Logic
-    const helpModal = document.getElementById('helpModal');
-    const helpBtn = document.getElementById('helpBtn');
-    const closeModal = document.querySelector('.close');
-
-    helpBtn.addEventListener('click', function() {
-        helpModal.style.display = 'block';
-    });
-
-    closeModal.addEventListener('click', function() {
-        helpModal.style.display = 'none';
-    });
-
-    window.addEventListener('click', function(event) {
-        if (event.target == helpModal) {
-            helpModal.style.display = 'none';
-        }
-    });
-
-    // Add or update a task
-    taskForm.addEventListener('submit', function(event) {
-        event.preventDefault();
-
-        const newTask = {
-            title: document.getElementById('title').value,
-            team: document.getElementById('team').value,
-            description: document.getElementById('description').value,
-            priority: Array.from(document.getElementById('priority').selectedOptions).map(option => option.value),
-            deadline: document.getElementById('deadline').value,
-            assignee: document.getElementById('assignee').value
-        };
-
-        if (editIndex === null) {
-            // Add new task
-            tasks.push(newTask);
-            undoStack.push([...tasks]); // Save state for undo
-            redoStack = []; // Clear redo stack
-            alert('Task added successfully!');
-        } else {
-            // Update the existing task
-            tasks[editIndex] = newTask;
-            undoStack.push([...tasks]); // Save state for undo
-            redoStack = []; // Clear redo stack
-            alert('Task updated successfully!');
-            editIndex = null;
-        }
-
-        taskForm.reset(); // Clear the form
-        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
-        displayTasks(); // Refresh the task table
-    });
-
-    // Function to display tasks
-    function displayTasks() {
-        taskTable.innerHTML = ''; // Clear the table
-        let hasMatch = false;
-
-        tasks.forEach((task, index) => {
-            if (filterTasks(task)) {
-                addTaskRow(task, index); // Add each task to the table
-                hasMatch = true;
-            }
-        });
-
-        if (!hasMatch) {
-            noMatchMessage.textContent = 'No task matching your search';
-        } else {
-            noMatchMessage.textContent = '';
-        }
-    }
-
-    function filterTasks(task) {
-        const searchQuery = searchInput.value.toLowerCase();
-        const filterValues = Array.from(filterSelect.selectedOptions).map(option => option.value);
-
-        return (task.title.toLowerCase().includes(searchQuery) ||
-                task.description.toLowerCase().includes(searchQuery)) &&
-                (filterValues.length === 0 || filterValues.some(filter => task.priority.includes(filter)));
-    }
-
-    // Add task row to the table
+    // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
         row.innerHTML = `
@@ -113,47 +33,91 @@ document.addEventListener('DOMContentLoaded', function() {
             </td>
             <td>
                 <button class="edit-btn">Update Task</button>
-                <button class="delete-btn">Delete</button>
+                <button class="delete-btn" style="color: red;">Delete</button>
             </td>
         `;
 
-        // Edit Task
-        row.querySelector('.edit-btn').addEventListener('click', () => editTask(index));
-
-        // Delete Task
-        row.querySelector('.delete-btn').addEventListener('click', () => {
-            if (confirm('Are you sure you want to delete this task?')) {
-                tasks.splice(index, 1); // Remove task
-                undoStack.push([...tasks]); // Save state for undo
-                redoStack = []; // Clear redo stack
-                alert('Task deleted successfully!');
-                displayTasks(); // Refresh tasks
-            }
+        // Add edit functionality
+        row.querySelector('.edit-btn').addEventListener('click', () => {
+            editTask(index);
         });
 
-        // Apply priority color
-        const priorityCell = row.cells[3];
-        if (task.priority.includes('High')) {
-            priorityCell.style.color = 'red';
-        } else if (task.priority.includes('Medium')) {
-            priorityCell.style.color = 'orange';
-        } else if (task.priority.includes('Low')) {
-            priorityCell.style.color = 'green';
+        // Add delete functionality
+        row.querySelector('.delete-btn').addEventListener('click', () => {
+            if (confirm('Are you sure you want to delete this task?')) {
+                tasks.splice(index, 1); // Remove the task from the list
+                undoStack.push([...tasks]); // Save state for undo
+                displayTasks(); // Re-display the tasks
+                alert('Task deleted successfully!');
+            }
+        });
+    }
+
+    // Function to display all tasks
+    function displayTasks() {
+        taskTable.innerHTML = ''; // Clear the table
+        const searchQuery = searchInput.value.toLowerCase();
+        const filterValues = Array.from(filterSelect.selectedOptions).map(option => option.value);
+
+        const filteredTasks = tasks.filter(task => 
+            (task.title.toLowerCase().includes(searchQuery) || 
+            task.description.toLowerCase().includes(searchQuery)) &&
+            (filterValues.length === 0 || filterValues.some(filter => task.priority.includes(filter)))
+        );
+
+        if (filteredTasks.length === 0 && searchQuery) {
+            taskTable.innerHTML = '<tr><td colspan="8" style="text-align: center;">No tasks matching your search</td></tr>';
+        } else {
+            filteredTasks.forEach((task, index) => addTaskRow(task, index));
         }
     }
 
-    // Edit task
+    // Add or update a task
+    taskForm.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const newTask = {
+            title: document.getElementById('title').value,
+            team: document.getElementById('team').value,
+            description: document.getElementById('description').value,
+            priority: Array.from(document.getElementById('priority').selectedOptions).map(option => option.value),
+            deadline: document.getElementById('deadline').value,
+            assignee: document.getElementById('assignee').value
+        };
+
+        if (editIndex === null) {
+            // Add new task
+            tasks.push(newTask);
+            undoStack.push([...tasks]); // Save state for undo
+            alert('Task added successfully!');
+        } else {
+            // Update the existing task
+            tasks[editIndex] = newTask;
+            undoStack.push([...tasks]); // Save state for undo
+            alert('Task updated successfully!');
+            editIndex = null;
+        }
+
+        taskForm.reset(); // Clear the form
+        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
+        displayTasks(); // Refresh the task table
+    });
+
+    // Function to fill the form with task data for editing
     function editTask(index) {
         const task = tasks[index];
         document.getElementById('title').value = task.title;
         document.getElementById('team').value = task.team;
         document.getElementById('description').value = task.description;
-        document.getElementById('priority').value = task.priority;
+        const prioritySelect = document.getElementById('priority');
+        for (let option of prioritySelect.options) {
+            option.selected = task.priority.includes(option.value);
+        }
         document.getElementById('deadline').value = task.deadline;
         document.getElementById('assignee').value = task.assignee;
 
         editIndex = index; // Set the current edit index
-        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change button text to "Update Task"
+        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
     }
 
     // Word count logic
@@ -168,31 +132,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Undo function
-    document.getElementById('undoBtn').addEventListener('click', function() {
+    undoButton.addEventListener('click', function() {
         if (undoStack.length > 1) {
-            redoStack.push(undoStack.pop()); // Save current state to redo stack
-            tasks = undoStack[undoStack.length - 1]; // Revert to previous state
-            displayTasks(); // Refresh tasks
-        }
-    });
-
-    // Redo function
-    document.getElementById('redoBtn').addEventListener('click', function() {
-        if (redoStack.length > 0) {
-            undoStack.push(redoStack.pop()); // Restore the next state
-            tasks = undoStack[undoStack.length - 1]; // Apply the next state
+            tasks = undoStack[undoStack.length - 2]; // Revert to the previous state
+            undoStack.pop(); // Remove the latest state (current)
             displayTasks(); // Refresh tasks
         }
     });
 
     // Reset function
-    document.getElementById('resetBtn').addEventListener('click', function() {
-        taskForm.reset();
-        document.querySelector('button[type="submit"]').textContent = 'Add Task';
+    resetButton.addEventListener('click', function() {
+        taskForm.reset(); // Clear the form
+        editIndex = null; // Reset edit index
+        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
+        displayTasks(); // Refresh the task table
     });
 
-    // Set date input to only show future dates
-    const today = new Date().toISOString().split('T')[0];
-    deadlineInput.setAttribute('min', today);
+    // Initialize the task table
+    displayTasks();
 });
-
