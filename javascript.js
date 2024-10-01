@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Help and Documentation Popup Logic
     document.getElementById('helpButton').addEventListener('click', function() {
         document.getElementById('helpPopup').style.display = 'block';
-        document.getElementById('helpMessage').textContent = "Hello"; // Show "Hello" message
+        document.getElementById('helpMessage').textContent = "Hey!"; // Show "Hello" message
     });
 
     // Close help popup
