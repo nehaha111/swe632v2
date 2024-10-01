@@ -273,3 +273,22 @@ td:nth-child(4) {
 #helpButton:hover {
     background-color: #2c3e91;
 }
+
+/* Reset Button Styles */
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#resetButton {
+    background-color: #f44336; /* Red background for reset */
+    color: white;
+}
+
+#resetButton:hover {
+    background-color: #e53935; /* Darker red on hover */
+}
+
