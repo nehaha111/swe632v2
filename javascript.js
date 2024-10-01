@@ -1,24 +1,37 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const taskForm = document.getElementById('taskForm');
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
     const filterSelect = document.getElementById('filter');
     const descriptionInput = document.getElementById('description');
     const wordCountDisplay = document.getElementById('wordCount');
-    const deadlineInput = document.getElementById('deadline');
-    const notification = document.getElementById('notification');
+    const messagePopup = document.getElementById('message');
 
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
+
+    // Function to get the color based on priority
+    function getPriorityColor(priority) {
+        switch (priority) {
+            case 'Low':
+                return 'green';
+            case 'Medium':
+                return 'orange';
+            case 'High':
+                return 'red';
+            default:
+                return 'black';
+        }
+    }
 
     // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
         row.innerHTML = `
-            <td>${task.name}</td>
+            <td>${task.title}</td>
             <td>${task.team}</td>
             <td>${task.description}</td>
-            <td style="color:${getPriorityColor(task.priority)}">${task.priority}</td>
+            <td style="color: ${getPriorityColor(task.priority)};">${task.priority}</td>
             <td>${task.deadline}</td>
             <td>${task.assignee}</td>
             <td>
@@ -30,8 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 </select>
             </td>
             <td>
-                <button class="update-btn">Update</button>
-                <button class="delete-btn" style="color:red;">Delete</button>
+                <button class="edit-btn">Update Task</button>
+                <button class="delete-btn" style="color: red;">Delete</button>
             </td>
         `;
 
@@ -40,38 +53,51 @@ document.addEventListener('DOMContentLoaded', function() {
             if (confirm('Are you sure you want to delete this task?')) {
                 tasks.splice(index, 1); // Remove the task from the list
                 displayTasks(); // Re-display the tasks
-                showNotification('Task deleted successfully!'); // Show notification
+                showMessage('Task deleted successfully!'); // Show message
             }
         });
 
-        // Add update functionality
-        row.querySelector('.update-btn').addEventListener('click', () => {
+        // Add edit functionality
+        row.querySelector('.edit-btn').addEventListener('click', () => {
             editTask(index);
         });
     }
 
-    // Function to get priority color
-    function getPriorityColor(priority) {
-        if (priority === 'High') return 'red';
-        if (priority === 'Medium') return 'orange';
-        if (priority === 'Low') return 'green';
-        return 'black';
+    // Function to filter tasks based on search and priority
+    function filterTasks() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const filterPriority = filterSelect.value;
+
+        return tasks.filter(task => {
+            const matchesSearch = task.title.toLowerCase().includes(searchTerm) || task.description.toLowerCase().includes(searchTerm);
+            const matchesPriority = filterPriority ? task.priority === filterPriority : true;
+
+            return matchesSearch && matchesPriority;
+        });
     }
 
     // Function to display all tasks
     function displayTasks() {
         taskTable.innerHTML = ''; // Clear the table
-        tasks.forEach((task, index) => {
+        const filteredTasks = filterTasks(); // Get filtered tasks
+        filteredTasks.forEach((task, index) => {
             addTaskRow(task, index); // Add each task to the table
         });
+
+        // Show message if no tasks match the search
+        if (filteredTasks.length === 0) {
+            showMessage('No tasks matching your search.', 'warning');
+        } else {
+            messagePopup.classList.add('hidden'); // Hide message
+        }
     }
 
-    // Add a task or update existing task
-    taskForm.addEventListener('submit', function(event) {
+    // Add or update a task
+    taskForm.addEventListener('submit', function (event) {
         event.preventDefault();
 
         const newTask = {
-            name: document.getElementById('title').value,
+            title: document.getElementById('title').value,
             team: document.getElementById('team').value,
             description: document.getElementById('description').value,
             priority: document.getElementById('priority').value,
@@ -82,85 +108,52 @@ document.addEventListener('DOMContentLoaded', function() {
         if (editIndex === null) {
             // Add new task
             tasks.push(newTask);
-            showNotification('Task added successfully!'); // Show notification
+            showMessage('Task added successfully!'); // Show message
         } else {
             // Update the existing task
             tasks[editIndex] = newTask;
-            showNotification('Task updated successfully!'); // Show notification
-            editIndex = null;
+            showMessage('Task updated successfully!'); // Show message
+            editIndex = null; // Reset edit index
         }
 
-        taskForm.reset(); // Clear the form
-        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
-        displayTasks(); // Refresh the task table
+        taskForm.reset(); // Reset form
+        displayTasks(); // Re-display the tasks
     });
 
-    // Function to fill the form with task data for editing
+    // Function to edit a task
     function editTask(index) {
+        editIndex = index; // Set the edit index
         const task = tasks[index];
-        document.getElementById('title').value = task.name;
+        document.getElementById('title').value = task.title;
         document.getElementById('team').value = task.team;
         document.getElementById('description').value = task.description;
         document.getElementById('priority').value = task.priority;
         document.getElementById('deadline').value = task.deadline;
         document.getElementById('assignee').value = task.assignee;
 
-        editIndex = index; // Set the current edit index
-        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
+        // Focus on the title input for convenience
+        document.getElementById('title').focus();
     }
 
-    // Word count logic
-    descriptionInput.addEventListener('input', function() {
-        const wordCount = descriptionInput.value.split(/\s+/).filter(word => word.length > 0).length;
-        wordCountDisplay.textContent = `${wordCount}/30 words`;
-        if (wordCount > 30) {
-            wordCountDisplay.style.color = 'red';
-        } else {
-            wordCountDisplay.style.color = '#888';
-        }
-    });
+    // Function to show message in the popup
+    function showMessage(message, type = 'success') {
+        messagePopup.textContent = message;
+        messagePopup.classList.remove('hidden');
+        messagePopup.style.backgroundColor = type === 'success' ? '#4caf50' : '#f44336'; // Green for success, red for error
 
-    // Set date input to only show future dates
-    const today = new Date().toISOString().split('T')[0];
-    deadlineInput.setAttribute('min', today);
-
-    // Function to filter tasks by search or multiple priorities
-    function filterTasks() {
-        const searchQuery = searchInput.value.toLowerCase();
-        const selectedPriorities = Array.from(filterSelect.selectedOptions).map(option => option.value);
-
-        const filteredTasks = tasks.filter(task => 
-            (task.name.toLowerCase().includes(searchQuery) || 
-            task.description.toLowerCase().includes(searchQuery)) &&
-            (selectedPriorities.length === 0 || selectedPriorities.includes(task.priority))
-        );
-
-        // Update the table based on filtered results
-        taskTable.innerHTML = ''; // Clear the table
-        if (filteredTasks.length === 0) {
-            const row = taskTable.insertRow();
-            row.innerHTML = `<td colspan="8" style="text-align:center;">No task matching your search.</td>`;
-        } else {
-            filteredTasks.forEach((task, index) => addTaskRow(task, index));
-        }
-    }
-
-    // Attach event listeners
-    searchInput.addEventListener('input', filterTasks);
-    filterSelect.addEventListener('change', filterTasks);
-
-    // Help and Documentation
-    const helpButton = document.getElementById('helpButton');
-    helpButton.addEventListener('click', () => {
-        showNotification('Help: To add a task, fill in the details and click "Add Task". Use the search bar to find tasks. You can filter tasks by priority. Click on "Update" to modify an existing task, or "Delete" to remove it.');
-    });
-
-    // Function to show notification messages
-    function showNotification(message) {
-        notification.textContent = message;
-        notification.style.display = 'block';
+        // Automatically hide the message after a few seconds
         setTimeout(() => {
-            notification.style.display = 'none';
-        }, 3000); // Notification will be visible for 3 seconds
+            messagePopup.classList.add('hidden');
+        }, 3000);
     }
+
+    // Update word count
+    descriptionInput.addEventListener('input', function () {
+        const wordCount = this.value.split(/\s+/).filter(word => word.length > 0).length; // Count non-empty words
+        wordCountDisplay.textContent = `${wordCount}/30 words`;
+    });
+
+    // Event listeners for search input and filter selection
+    searchInput.addEventListener('input', displayTasks);
+    filterSelect.addEventListener('change', displayTasks);
 });
