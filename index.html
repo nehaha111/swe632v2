@@ -4,60 +4,56 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="styles.css">
-    <title>Task Management Application</title>
+    <title>Task Management</title>
 </head>
 <body>
     <div class="container">
-        <h1>Task Management</h1>
-        <div class="help-section">
-            <button id="help-btn">Help & Documentation</button>
-        </div>
+        <h1>Task Management Application</h1>
         <form id="taskForm">
-            <div class="form-group">
-                <label for="task-name">Name of the Task:</label>
-                <input type="text" id="task-name" required>
-            </div>
-            <div class="form-group">
-                <label for="team">Team:</label>
-                <select id="team" required>
-                    <option value="Development">Development</option>
-                    <option value="Design">Design</option>
-                    <option value="Marketing">Marketing</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="description">Description of the Task:</label>
-                <input type="text" id="description" required>
-                <div id="wordCount">0/30 words</div>
-            </div>
-            <div class="form-group">
-                <label for="priority">Priority:</label>
-                <select id="priority" required>
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="deadline">Deadline:</label>
-                <input type="date" id="deadline" required>
-            </div>
-            <div class="form-group">
-                <label for="assignee">Assignee:</label>
-                <select id="assignee" required>
-                    <option value="Alice">Alice</option>
-                    <option value="Bob">Bob</option>
-                    <option value="Charlie">Charlie</option>
-                </select>
-            </div>
+            <label for="title">Name of the Task:</label>
+            <input type="text" id="title" required>
+
+            <label for="team">Team:</label>
+            <select id="team" required>
+                <option value="Team A">Team A</option>
+                <option value="Team B">Team B</option>
+                <option value="Team C">Team C</option>
+            </select>
+
+            <label for="description">Description of the Task:</label>
+            <textarea id="description" maxlength="30" required></textarea>
+            <span id="wordCount">0/30 words</span>
+
+            <label for="priority">Priority:</label>
+            <select id="priority" required>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+
+            <label for="deadline">Deadline:</label>
+            <input type="date" id="deadline" required>
+
+            <label for="assignee">Assignee:</label>
+            <input type="text" id="assignee" required>
+
             <button type="submit">Add Task</button>
-            <button type="button" id="undo-btn">Undo</button>
-            <button type="button" id="reset-btn">Reset</button>
+            <button type="reset">Reset</button>
+            <button id="helpButton" type="button">Help and Documentation</button>
         </form>
+
         <div class="search-container">
-            <input type="text" id="search" placeholder="Search Tasks...">
-            <button id="search-btn">🔍</button>
+            <input type="text" id="search" placeholder="Search tasks...">
+            <span class="icon">&#128269;</span>
         </div>
+
+        <label for="filter">Filter by Priority:</label>
+        <select id="filter" multiple>
+            <option value="High">High</option>
+            <option value="Medium">Medium</option>
+            <option value="Low">Low</option>
+        </select>
+
         <table id="taskTable">
             <thead>
                 <tr>
@@ -73,13 +69,10 @@
             </thead>
             <tbody></tbody>
         </table>
-        <div id="no-results-message" class="message"></div>
+
+        <div id="notification" class="notification"></div>
     </div>
+
     <script src="script.js"></script>
-</body>
-</html>
-
-
-    <script src="javascript.js"></script>
 </body>
 </html>
