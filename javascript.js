@@ -2,16 +2,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const taskForm = document.getElementById('taskForm');
     const taskTable = document.getElementById('taskTable').getElementsByTagName('tbody')[0];
     const searchInput = document.getElementById('search');
+    const filterSelect = document.getElementById('filter');
     const descriptionInput = document.getElementById('description');
     const wordCountDisplay = document.getElementById('wordCount');
     const deadlineInput = document.getElementById('deadline');
-    const helpButton = document.getElementById('helpButton');
-    const messagePopup = document.getElementById('messagePopup');
-    const priorityFilter = document.getElementById('priorityFilter');
+    const noResultsMessage = document.getElementById('noResults');
 
     let tasks = [];
-    let editIndex = null;
+    let editIndex = null; // Track the index of the task being edited
 
+    // Function to add a row to the task table
     function addTaskRow(task, index) {
         const row = taskTable.insertRow();
         row.innerHTML = `
@@ -30,31 +30,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 </select>
             </td>
             <td>
-                <button class="update-btn">Update</button>
+                <button class="edit-btn">Edit</button>
                 <button class="delete-btn">Delete</button>
             </td>
         `;
 
+        // Add delete functionality
         row.querySelector('.delete-btn').addEventListener('click', () => {
             if (confirm('Are you sure you want to delete this task?')) {
-                tasks.splice(index, 1);
-                displayTasks();
-                showMessagePopup('Task deleted successfully!');
+                tasks.splice(index, 1); // Remove the task from the list
+                displayTasks(); // Re-display the tasks
+                showMessage('Task deleted successfully!');
             }
         });
 
-        row.querySelector('.update-btn').addEventListener('click', () => {
+        // Add edit functionality
+        row.querySelector('.edit-btn').addEventListener('click', () => {
             editTask(index);
         });
+
+        // Apply priority color to the priority cell
+        const priorityCell = row.cells[3];
+        if (task.priority === 'High') {
+            priorityCell.style.color = 'red';
+        } else if (task.priority === 'Medium') {
+            priorityCell.style.color = 'orange';
+        } else if (task.priority === 'Low') {
+            priorityCell.style.color = 'green';
+        }
     }
 
+    // Function to display all tasks
     function displayTasks() {
-        taskTable.innerHTML = '';
+        taskTable.innerHTML = ''; // Clear the table
         tasks.forEach((task, index) => {
-            addTaskRow(task, index);
+            addTaskRow(task, index); // Add each task to the table
         });
     }
 
+    // Add or update a task
     taskForm.addEventListener('submit', function(event) {
         event.preventDefault();
 
@@ -68,18 +82,22 @@ document.addEventListener('DOMContentLoaded', function() {
         };
 
         if (editIndex === null) {
+            // Add new task
             tasks.push(newTask);
-            showMessagePopup('Task added successfully!');
+            showMessage('Task added successfully!');
         } else {
+            // Update the existing task
             tasks[editIndex] = newTask;
-            showMessagePopup('Task updated successfully!');
+            showMessage('Task updated successfully!');
             editIndex = null;
         }
 
-        taskForm.reset();
-        displayTasks();
+        taskForm.reset(); // Clear the form
+        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text
+        displayTasks(); // Refresh the task table
     });
 
+    // Function to fill the form with task data for editing
     function editTask(index) {
         const task = tasks[index];
         document.getElementById('title').value = task.title;
@@ -89,54 +107,68 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('deadline').value = task.deadline;
         document.getElementById('assignee').value = task.assignee;
 
-        editIndex = index;
-        document.getElementById('addButton').textContent = 'Update Task';
+        editIndex = index; // Set the current edit index
+        document.querySelector('button[type="submit"]').textContent = 'Update Task'; // Change the button text to "Update Task"
     }
 
+    // Word count logic
     descriptionInput.addEventListener('input', function() {
-        const words = this.value.trim().split(/\s+/);
-        const wordCount = words.length;
+        const wordCount = descriptionInput.value.split(/\s+/).filter(word => word.length > 0).length;
         wordCountDisplay.textContent = `${wordCount}/30 words`;
+        wordCountDisplay.style.color = wordCount > 30 ? 'red' : '#888';
     });
 
-    helpButton.addEventListener('click', function() {
-        alert('Help & Documentation:\n1. Fill in the task details.\n2. Click "Add Task" to save.\n3. Use "Update" to modify existing tasks.\n4. Use checkboxes to filter tasks by priority.');
-    });
+    // Set date input to only show future dates
+    const today = new Date().toISOString().split('T')[0];
+    deadlineInput.setAttribute('min', today);
 
-    function showMessagePopup(message) {
-        messagePopup.textContent = message;
-        messagePopup.classList.add('show');
+    // Function to filter tasks by search or priority
+    function filterTasks() {
+        const searchQuery = searchInput.value.toLowerCase();
+        const filterValue = filterSelect.value;
+
+        const filteredTasks = tasks.filter(task => 
+            (task.title.toLowerCase().includes(searchQuery) || 
+            task.description.toLowerCase().includes(searchQuery)) &&
+            (filterValue === '' || task.priority === filterValue)
+        );
+
+        taskTable.innerHTML = ''; // Clear the table
+
+        if (filteredTasks.length > 0) {
+            filteredTasks.forEach((task, index) => {
+                addTaskRow(task, tasks.indexOf(task));
+            });
+            noResultsMessage.style.display = 'none';
+        } else {
+            noResultsMessage.style.display = 'block';
+        }
+    }
+
+    searchInput.addEventListener('input', filterTasks);
+    filterSelect.addEventListener('change', filterTasks);
+
+    // Function to display a popup message
+    function showMessage(message) {
+        const popup = document.createElement('div');
+        popup.className = 'popup';
+        popup.innerHTML = `
+            <p>${message}</p>
+            <button class="close-btn">Close</button>
+        `;
+        document.body.appendChild(popup);
+
+        // Close button functionality
+        popup.querySelector('.close-btn').addEventListener('click', () => {
+            document.body.removeChild(popup);
+        });
+
+        // Automatically remove popup after 3 seconds
         setTimeout(() => {
-            messagePopup.classList.remove('show');
+            if (document.body.contains(popup)) {
+                document.body.removeChild(popup);
+            }
         }, 3000);
     }
-
-    searchInput.addEventListener('input', function() {
-        const searchValue = this.value.toLowerCase();
-        const filteredTasks = tasks.filter(task => 
-            task.title.toLowerCase().includes(searchValue) ||
-            task.description.toLowerCase().includes(searchValue)
-        );
-        displayFilteredTasks(filteredTasks);
-    });
-
-    priorityFilter.addEventListener('change', function() {
-        const selectedPriorities = Array.from(this.querySelectorAll('input:checked')).map(input => input.value);
-        const filteredTasks = tasks.filter(task => selectedPriorities.length === 0 || selectedPriorities.includes(task.priority));
-        displayFilteredTasks(filteredTasks);
-    });
-
-    function displayFilteredTasks(filteredTasks) {
-        taskTable.innerHTML = '';
-        filteredTasks.forEach((task, index) => {
-            addTaskRow(task, index);
-        });
-    }
-
-    document.getElementById('resetButton').addEventListener('click', function() {
-        taskForm.reset();
-        editIndex = null;
-        document.getElementById('addButton').textContent = 'Add Task';
-        showMessagePopup('Form reset successfully!');
-    });
 });
+
