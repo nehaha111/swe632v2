@@ -3,76 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Task Engine Prototype</title>
     <link rel="stylesheet" href="styles.css">
+    <title>Task Manager</title>
 </head>
 <body>
-    <h1>Task Engine</h1>
-
     <div class="container">
-        <div class="task-form">
-            <form id="taskForm">
-                <div class="form-left">
-                    <label for="title">Title:</label>
+        <header>
+            <h1>Task Management</h1>
+            <button id="helpBtn">Help & Documentation</button>
+        </header>
+
+        <!-- Task Form -->
+        <form id="taskForm">
+            <div class="form-row">
+                <div class="left-column">
+                    <label for="title">Name of the Task:</label>
                     <input type="text" id="title" required>
 
-                    <label for="description">Description:</label>
-                    <textarea id="description" required></textarea>
-                    <p id="wordCount">0/30 words</p>
-
-                    <label for="deadline">Deadline:</label>
-                    <input type="date" id="deadline" required>
-                </div>
-
-                <div class="form-right">
                     <label for="team">Team:</label>
-                    <select id="team" required>
-                        <option value="Development Team">Development Team</option>
-                        <option value="Design Team">Design Team</option>
-                        <option value="Quality Assurance Team">Quality Assurance Team</option>
-                        <option value="Business Analyst Team">Business Analyst Team</option>
-                        <option value="Marketing Team">Marketing Team</option>
-                        <option value="Support Team">Support Team</option>
-                        <option value="Documentation Team">Documentation Team</option>
+                    <select id="team">
+                        <option value="Team A">Team A</option>
+                        <option value="Team B">Team B</option>
+                        <option value="Team C">Team C</option>
                     </select>
 
                     <label for="priority">Priority:</label>
-                    <select id="priority" required>
-                        <option value="Low">Low</option>
-                        <option value="Medium">Medium</option>
+                    <select id="priority" multiple>
                         <option value="High">High</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Low">Low</option>
                     </select>
+                </div>
+                
+                <div class="right-column">
+                    <label for="description">Description of the Task:</label>
+                    <textarea id="description"></textarea>
+                    <div id="wordCount">0/30 words</div>
+
+                    <label for="deadline">Deadline:</label>
+                    <input type="date" id="deadline" required>
 
                     <label for="assignee">Assignee:</label>
-                    <select id="assignee" required>
-                        <option value="Member1">Member1</option>
-                        <option value="Member2">Member2</option>
-                        <option value="Member3">Member3</option>
-                        <option value="Member4">Member4</option>
-                    </select>
-
-                    <button type="submit">Add Task</button>
+                    <input type="text" id="assignee" required>
                 </div>
-            </form>
-        </div>
+            </div>
+            
+            <div class="form-row">
+                <button type="submit">Add Task</button>
+                <button type="button" id="resetBtn">Reset</button>
+                <button type="button" id="undoBtn">Undo</button>
+                <button type="button" id="redoBtn">Redo</button>
+            </div>
+        </form>
 
-        <div class="search-filter">
-            <input type="text" id="search" placeholder="Search tasks">
-            <select id="filter">
-                <option value="">All</option>
-                <option value="Low">Low Priority</option>
-                <option value="Medium">Medium Priority</option>
-                <option value="High">High Priority</option>
+        <!-- Search and Filter -->
+        <div class="search-filter-section">
+            <label for="search">
+                <span class="icon">&#128269;</span> <!-- Magnifying Glass Icon -->
+                Search Task:
+            </label>
+            <input type="text" id="search" placeholder="Search tasks...">
+            <label for="filter">Filter by Priority:</label>
+            <select id="filter" multiple>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
             </select>
-            <p id="noResults" style="display: none;">No task matches your search.</p>
+            <div id="noMatchMessage"></div> <!-- No matches message -->
         </div>
 
+        <!-- Task Table -->
         <table id="taskTable">
             <thead>
                 <tr>
-                    <th>Title</th>
+                    <th>Name of the Task</th>
                     <th>Team</th>
-                    <th>Description</th>
+                    <th>Description of the Task</th>
                     <th>Priority</th>
                     <th>Deadline</th>
                     <th>Assignee</th>
@@ -82,6 +88,15 @@
             </thead>
             <tbody></tbody>
         </table>
+    </div>
+
+    <!-- Help and Documentation Modal -->
+    <div id="helpModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Help & Documentation</h2>
+            <p>This is the task manager. Here you can add, update, and delete tasks...</p>
+        </div>
     </div>
 
     <script src="javascript.js"></script>
