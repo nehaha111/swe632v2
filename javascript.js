@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const wordCountDisplay = document.getElementById('wordCount');
     const deadlineInput = document.getElementById('deadline');
     const noResultsMessage = document.getElementById('noResults');
+    const resetButton = document.getElementById('resetButton');
 
     let tasks = [];
     let editIndex = null; // Track the index of the task being edited
@@ -180,5 +181,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Close help popup
     document.getElementById('closePopup').addEventListener('click', function() {
         document.getElementById('helpPopup').style.display = 'none';
+    });
+
+    // Add this inside the DOMContentLoaded event listener
+    resetButton.addEventListener('click', function() {
+        taskForm.reset(); // Reset the form fields to their initial values
+        document.querySelector('button[type="submit"]').textContent = 'Add Task'; // Reset button text to 'Add Task'
+        editIndex = null; // Clear the edit index
+        noResultsMessage.style.display = 'none'; // Hide no results message
     });
 });
