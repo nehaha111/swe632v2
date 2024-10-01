@@ -49,16 +49,6 @@ document.addEventListener('DOMContentLoaded', function() {
             editTask(index);
         });
 
-        // Help and Documentation Button Popup Logic
-document.getElementById('helpButton').addEventListener('click', function() {
-    document.getElementById('helpPopup').style.display = 'block';
-});
-
-document.getElementById('closePopup').addEventListener('click', function() {
-    document.getElementById('helpPopup').style.display = 'none';
-});
-
-
         // Apply priority color to the priority cell
         const priorityCell = row.cells[3];
         if (task.priority === 'High') {
@@ -180,5 +170,15 @@ document.getElementById('closePopup').addEventListener('click', function() {
             }
         }, 3000);
     }
-});
 
+    // Help and Documentation Popup Logic
+    document.getElementById('helpButton').addEventListener('click', function() {
+        document.getElementById('helpPopup').style.display = 'block';
+        document.getElementById('helpMessage').textContent = "Hello"; // Show "Hello" message
+    });
+
+    // Close help popup
+    document.getElementById('closePopup').addEventListener('click', function() {
+        document.getElementById('helpPopup').style.display = 'none';
+    });
+});
